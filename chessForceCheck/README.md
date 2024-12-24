@@ -15,6 +15,8 @@ To overcome this issue, I created a small tool: when it's your turn, this tool p
     Your browser does not support the video tag.
 </video>
 
+[Demo Video](example.mov)
+
 ## Preliminary Notes
 * Currently only supports the web version of chess.com
   - If you want to use this tool on other websites, leave a comment below, and I'll work on compatibility support for other sites when time permits
@@ -51,6 +53,8 @@ javascript:(function()%7B(function () %7B%0A  "use strict"%3B%0A%0A  let activeG
     <source src="full-example.mov" type="video/mp4">
     Your browser does not support the video tag.
 </video>
+
+[Full Example Video](full-example.mov)
 
 #### 4. Play
 
