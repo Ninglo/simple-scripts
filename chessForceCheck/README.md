@@ -8,12 +8,13 @@ However, playing rapid chess for a long time has led me to develop a bad habit o
 
 To overcome this issue, I created a small tool: when it's your turn, this tool prevents you from controlling the chess pieces. You must complete six check items before you can operate the board. This way, I am forced to complete the checks before making a move. I've used this tool in my practice over the past two days and found it quite effective, so I'm sharing it with everyone, hoping it helps those who face similar struggles.
 
+After using this tool for a while, I won 12 games in a row! (The elo is a bit low because I only played chess for two weeks 🥹)
+
+![12win](12win.png)
+
 ## Demo
 
-<video width="320" height="240" controls>
-    <source src="example.mov" type="video/mp4">
-    Your browser does not support the video tag.
-</video>
+![Demo](example.gif)
 
 [Demo Video](example.mov)
 

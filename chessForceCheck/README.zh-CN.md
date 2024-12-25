@@ -6,12 +6,13 @@
 
 为了克服这个问题，我做了一个小工具：在每一次轮到自己回合时，此工具会阻止用户操控棋盘棋子。需要先完成六个检查事项之后，才可以操作页面。如此一来，我就不得不就逼迫自己首先完成检查，然后再落子。我在最近两天的练习中使用了这个工具，发现效果还不错，因此分享给大家，希望对那些同样困扰于此的朋友有所帮助。
 
+使用此工具进行一段时间练习后，我获得了 **12 场比赛的连胜**！（由于我只刚学了两个星期的象棋，所以 elo 有点低）
+
+![12win](12win.png)
+
 ## 演示
 
-<video width="320" height="240" controls>
-    <source src="example.mov" type="video/mp4">
-    Your browser does not support the video tag.
-</video>
+![Demo](example.gif)
 
 ## 一些前置说明
 * 当前仅支持 chess.com 的网页版
