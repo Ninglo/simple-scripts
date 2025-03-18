@@ -1,0 +1,35 @@
+{
+    "manifest_version": 3,
+    "name": "YouTube 词汇学习助手",
+    "version": "1.0",
+    "description": "从YouTube视频中提取并翻译重要词汇",
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "storage"
+    ],
+    "host_permissions": [
+        "https://www.youtube.com/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*.youtube.com/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "content.css"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_title": "YouTube 词汇学习助手",
+        "default_popup": "popup.html"
+    }
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    .container { padding: 20px; min-width: 300px; }
+    .config-section { margin-bottom: 15px; }
+    .config-section label { display: block; margin-bottom: 5px; }
+    .config-section input { width: 100%; padding: 5px; margin-bottom: 10px; }
+    .save-btn { 
+      width: 100%;
+      padding: 8px;
+      background: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .status { margin-top: 10px; color: #4CAF50; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>配置设置</h2>
+    <div class="config-section">
+      <label for="apiKey">OpenAI API Key:</label>
+      <input type="password" id="apiKey" placeholder="输入您的API Key">
+      
+      <label for="vocabLevel">默认词汇量:</label>
+      <input type="number" id="vocabLevel" placeholder="例如: 8000">
+    </div>
+    <button id="saveConfig" class="save-btn">保存配置</button>
+    <div id="status" class="status"></div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

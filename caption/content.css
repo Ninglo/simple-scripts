@@ -1,0 +1,74 @@
+#vocab-helper-sidebar {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 40vw;
+    height: 100vh;
+    background: white;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    z-index: 9999;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#vocab-helper-sidebar.active {
+    transform: translateX(0);
+}
+
+#vocab-helper-toggle {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    z-index: 10000;
+    padding: 8px 12px;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 10px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.vocab-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.vocab-table th, .vocab-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.vocab-table th {
+    background-color: #f8f9fa;
+}
+
+.result-content {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.6;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    white-space: pre-line;
+}
