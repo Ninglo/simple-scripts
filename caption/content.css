@@ -11,6 +11,8 @@
     transition: transform 0.3s ease;
     padding: 20px;
     box-sizing: border-box;
+    min-width: 300px;
+    max-width: 80vw;
 }
 
 #vocab-helper-sidebar.active {
@@ -71,4 +73,30 @@
     max-height: calc(100vh - 200px);
     overflow-y: auto;
     white-space: pre-line;
+}
+
+/* 添加拖拽条样式 */
+#vocab-helper-resize {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    cursor: ew-resize;
+    background: transparent;
+}
+
+#vocab-helper-resize:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* 拖拽时的遮罩 */
+.resize-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10001;
+    cursor: ew-resize;
 }

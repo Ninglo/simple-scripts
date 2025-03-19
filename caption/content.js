@@ -1,5 +1,7 @@
 console.log("wowowow");
 
+let hasLoadedContent = false;
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "getSubtitles") {
     getCompleteSubtitles()
@@ -8,6 +10,49 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
 });
+
+// 更新消息监听器，使用单个监听器
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "streamUpdate") {
+    const resultDiv = document.getElementById("result");
+    if (resultDiv) {
+      // 如果是第一次接收内容，清空并创建文本节点
+      if (!resultDiv._textNode) {
+        resultDiv.textContent = "";
+        resultDiv._textNode = document.createTextNode("");
+        resultDiv.appendChild(resultDiv._textNode);
+      }
+
+      // 仅更新文本节点的内容
+      resultDiv._textNode.nodeValue += message.content;
+      resultDiv.scrollTop = resultDiv.scrollHeight;
+      resultDiv.style.display = "block";
+    }
+  } else if (message.type === "streamError") {
+    showError(message.error);
+  }
+});
+
+// 替换为新的监听器
+const messageHandler = (message) => {
+  if (message.type === "streamUpdate") {
+    const resultDiv = document.getElementById("result");
+    if (resultDiv) {
+      if (!resultDiv._content) {
+        resultDiv._content = "";
+      }
+      resultDiv._content += message.content;
+      resultDiv.textContent = resultDiv._content;
+      resultDiv.scrollTop = resultDiv.scrollHeight;
+      resultDiv.style.display = "block";
+    }
+  } else if (message.type === "streamError") {
+    showError(message.error);
+  }
+};
+
+// 注册单个消息监听器
+chrome.runtime.onMessage.addListener(messageHandler);
 
 async function getCompleteSubtitles() {
   console.log("开始获取字幕");
@@ -96,12 +141,13 @@ function createSidebar() {
   const sidebar = document.createElement("div");
   sidebar.id = "vocab-helper-sidebar";
   sidebar.innerHTML = `
+      <div id="vocab-helper-resize"></div>
       <h3>YouTube 词汇学习助手</h3>
       <div id="loading" style="display: none;">
           <div class="spinner"></div>
           <p>正在分析字幕内容...</p>
       </div>
-      <div id="error" color: red;"></div>
+      <div id="error" style="display: none; color: red;"></div>
       <div id="result" class="result-content"></div>
   `;
 
@@ -110,7 +156,6 @@ function createSidebar() {
   toggleButton.textContent = "词汇助手";
   toggleButton.onclick = async () => {
     sidebar.classList.toggle("active");
-    // 如果是打开侧边栏，自动开始分析
     if (sidebar.classList.contains("active")) {
       await handleAnalysis();
     }
@@ -118,26 +163,67 @@ function createSidebar() {
 
   document.body.appendChild(sidebar);
   document.body.appendChild(toggleButton);
+
+  // 添加拖拽调整功能
+  const resizeHandle = document.getElementById("vocab-helper-resize");
+  let startX, startWidth;
+
+  function startResize(e) {
+    startX = e.clientX;
+    startWidth = parseInt(getComputedStyle(sidebar).width, 10);
+
+    // 创建遮罩层
+    const overlay = document.createElement("div");
+    overlay.className = "resize-overlay";
+    document.body.appendChild(overlay);
+
+    // 添加移动和结束事件监听
+    document.addEventListener("mousemove", resize);
+    document.addEventListener("mouseup", stopResize);
+
+    // 防止文本选中
+    e.preventDefault();
+  }
+
+  function resize(e) {
+    const diff = startX - e.clientX;
+    const newWidth = Math.min(
+      Math.max(startWidth + diff, 300),
+      window.innerWidth * 0.8
+    );
+    sidebar.style.width = `${newWidth}px`;
+  }
+
+  function stopResize() {
+    // 移除遮罩层和事件监听
+    document.querySelector(".resize-overlay")?.remove();
+    document.removeEventListener("mousemove", resize);
+    document.removeEventListener("mouseup", stopResize);
+  }
+
+  resizeHandle.addEventListener("mousedown", startResize);
 }
 
 async function handleAnalysis() {
+  // Skip if content is already loaded
+  if (hasLoadedContent && document.getElementById("result").textContent.trim()) {
+    return;
+  }
+
   showLoading(true);
   try {
     console.log("开始获取字幕");
     const subtitles = await getCompleteSubtitles();
     console.log("获取到的字幕内容:", subtitles.slice(0, 100) + "...");
 
-    // 从storage获取词汇量设置
     const config = await chrome.storage.local.get(["vocabLevel"]);
     if (!config.vocabLevel) {
       throw new Error("请先在插件配置中设置词汇量");
     }
 
     console.log("开始调用AI接口");
-    const result = await callAI(subtitles, config.vocabLevel);
-    console.log("AI返回结果:", result);
-
-    displayResults(result);
+    await callAI(subtitles, config.vocabLevel);
+    hasLoadedContent = true;
   } catch (error) {
     console.error("处理过程出错:", error);
     showError(error.message);
@@ -149,59 +235,58 @@ async function handleAnalysis() {
 async function callAI(subtitles, level) {
   console.log("Content: 准备调用AI");
 
-  // 从存储中获取API key
-  const config = await chrome.storage.local.get(["apiKey"]);
+  const config = await chrome.storage.local.get(["apiKey", "baseUrl", "model"]);
   if (!config.apiKey) {
     throw new Error("请先在插件配置中设置API Key");
   }
 
+  // 清空结果区域，重置内容
+  const resultDiv = document.getElementById("result");
+  if (resultDiv) {
+    resultDiv.textContent = "";
+    resultDiv._content = ""; // 重置存储的内容
+    resultDiv.style.display = "block";
+  }
+
   const prompt = `
-      请分析以下英文字幕内容，提取出对词汇量为${level}的学习者来说可能较难理解的单词。
-      要求：
-      1. 只提取明显超出该词汇量水平的重要单词
-      2. 单词应该对理解视频内容有重要作用
-      3. 优先选择在学术或专业场合常用的词汇
-      4. 最多提供20个单词
-      5. 请使用中文给出简明的释义和用法说明
-
-      字幕内容: "${subtitles}"
+  作为英语教育专家，请对这个视频内容进行快速分析，帮助学习者（词汇量${level}）决定是否适合学习观看。
+  请按以下结构简明扼要地分析：
+  
+  0. 学习建议：
+     - 建议是否观看（直接给出"建议观看"或"建议跳过"）
+     - 如果建议观看，提供1-2个具体的学习策略
+  
+  1. 内容速览 (50字以内)：
+     - 视频主要讨论什么
+     - 讲话者的语速和发音特点
+  
+  2. 难度匹配度评估：
+     - 整体难度等级（CEFR标准）
+     - 与学习者水平的匹配程度：完全合适/稍有挑战/可能困难
+     - 预计理解度：x%
+  
+  3. 主要挑战点（如果合适学习）：
+     - 列出主要的关键难词/短语及其含义
+     - 提示若干需要注意的语言点（如从句结构、习语等）
+  
+  字幕内容: "${subtitles}"
   `;
-
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     chrome.runtime.sendMessage(
       {
         action: "callAI",
         apiKey: config.apiKey,
+        baseUrl: config.baseUrl,
+        model: config.model,
         prompt: prompt,
       },
       (response) => {
-        console.log("Content: 收到AI响应:", response);
-        if (response?.success) {
-          resolve(response.data);
-        } else {
-          reject(new Error(response?.error || "AI分析失败"));
+        if (response?.success && response?.status === "streaming") {
+          resolve({ words: "" });
         }
       }
     );
   });
-}
-
-function displayResults(aiResponse) {
-  console.log("Content: 开始展示结果:", aiResponse);
-  const resultDiv = document.getElementById("result");
-  if (!resultDiv) {
-    console.error("找不到结果展示区域");
-    return;
-  }
-
-  try {
-    resultDiv.innerHTML = aiResponse.words.replace(/\n/g, "<br>");
-    resultDiv.style.display = "block";
-    console.log("结果展示完成");
-  } catch (error) {
-    console.error("展示结果时出错:", error);
-    showError("展示结果时出错: " + error.message);
-  }
 }
 
 function showLoading(show) {
