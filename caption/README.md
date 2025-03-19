@@ -32,7 +32,7 @@
 4. 唤出插件配置弹窗
 ![alt text](images/image-1.png)
 ![alt text](images/image-2.png)
-5. 配置好 API & model & API key & 词汇量
+5. 配置好 API & model & API key & 词汇量（也有白嫖 key 的手段，如果需要我介绍可以提 issue）
 6. 打开 YouTube 视频页，点击右上角的`词汇助手` button
 ![alt text](images/Snipaste_2025-03-19_11-45-06.png)
 7. Enjoy!（弹窗出来会加载若干秒，取决于 AI 本身响应速率）
