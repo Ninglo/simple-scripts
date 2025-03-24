@@ -32,7 +32,12 @@
 4. 唤出插件配置弹窗
 ![alt text](images/image-1.png)
 ![alt text](images/image-2.png)
-5. 配置好 API & model & API key & 词汇量（也有白嫖 key 的手段，如果需要我介绍可以提 issue）
+5. 配置好 API & model & API key & 词汇量
+5.5  白嫖 API key:
+    - 打开 https://siliconflow.cn/ 并注册，自动获得免费的 ¥14 余额
+    - 注：非广，各大模型分发平台均有相关策略，可自行选择平台使用
+    - 在插件配置页设置 API 地址为 `https://api.siliconflow.cn/v1` ![alt text](image.png)
+    - 设置你的 api key，见 [API 密钥页](https://cloud.siliconflow.cn/account/ak)；模型可自行选择，详见 [API 文档](https://docs.siliconflow.cn/cn/api-reference/chat-completions/chat-completions) 中的 `Available options`
 6. 打开 YouTube 视频页，点击右上角的`词汇助手` button
 ![alt text](images/Snipaste_2025-03-19_11-45-06.png)
 7. Enjoy!（弹窗出来会加载若干秒，取决于 AI 本身响应速率）
